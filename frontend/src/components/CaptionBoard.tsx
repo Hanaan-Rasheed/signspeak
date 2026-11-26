@@ -1,0 +1,9 @@
+'use client';
+import {useMemo,useState} from 'react';
+import {Contrast,Minus,Plus,Type,Volume2} from 'lucide-react';
+import type {Segment} from '@/types';
+export default function CaptionBoard({segments,interim,teacher=false}:{segments:Segment[];interim:string;teacher?:boolean}){
+ const[size,setSize]=useState(2),[contrast,setContrast]=useState(false);
+ const words=useMemo(()=>segments.filter(s=>s.kind==='speech').map(s=>s.text).join(' ').trim().split(/\s+/).filter(Boolean).slice(-65).join(' '),[segments]);
+ return <div className={contrast?'caption-shell contrast':'caption-shell'}><div className="caption-top"><span><Volume2 size={18}/> {teacher?'YOUR LIVE SPEECH':'LIVE CAPTIONS · TEACHER'}</span><span className="caption-mode">{interim?'LISTENING':'CAPTION STAGE'}</span></div><div className="caption-text" style={{fontSize:`clamp(${1.45+size*.23}rem, ${2+size*.4}vw, ${2.1+size*.42}rem)`}} aria-label="Live speech captions"><span>{words||(!interim?'Waiting for speech to begin…':'')}</span> <span className="interim">{interim}</span>{interim&&<span className="cursor"/>}</div><div className="caption-toolbar"><span className="tool-heading"><Type size={16}/> CAPTION OPTIONS</span><div className="tool-buttons"><button onClick={()=>setSize(Math.max(0,size-1))} disabled={size===0} aria-label="Smaller captions"><Minus size={18}/></button><span className="font-size-label">Aa</span><button onClick={()=>setSize(Math.min(4,size+1))} disabled={size===4} aria-label="Larger captions"><Plus size={18}/></button><span className="tool-divider"/><button onClick={()=>setContrast(!contrast)} aria-pressed={contrast} aria-label="Toggle high contrast"><Contrast size={18}/><span>Contrast</span></button></div></div><div className="sr-only" aria-live="polite" aria-atomic="false">{segments.filter(s=>s.kind==='speech').slice(-1)[0]?.text||''}</div></div>;
+}
